@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kani Traders</title>
+  <link rel="icon" type="image/png" href="/logo_32x32.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -680,13 +681,23 @@
       }
       .hero h1 { font-size: clamp(3.5rem, 16vw, 5rem); }
     }
+
+    .nav-logo-img {
+      height: 38px;
+      width: auto;
+      display: block;
+      filter: brightness(1.05);
+    }
   </style>
 </head>
 <body>
 
   <!-- NAV -->
   <nav>
-    <a href="#" class="nav-logo">Kani<span> </span>Traders</a>
+    <a href="#" class="nav-logo">
+      <!-- <img src="/logo.png" 
+      alt="Kani Traders Logo" class="nav-logo-img" /> -->
+      Kani<span> </span>Traders</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#metals">Metals</a></li>
@@ -910,7 +921,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">Kani<span>&nbsp;</span>Traders</div>
-    <p>No.1A/14, Gandhi Street, Kanu Nagar, Nesapakkam, Chennai - 600078</p>
+    <!-- <p>No.1A/14, Gandhi Street, Kanu Nagar, Nesapakkam, Chennai - 600078</p> -->
     <p>© 2026 Kani Traders. All rights reserved.</p>
   </footer>
 
