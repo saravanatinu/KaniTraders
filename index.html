@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kani Traders – Metal Scrap Dealers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rust:   #C9450A;
+      --amber:  #E8A020;
+      --steel:  #8A9BAD;
+      --dark:   #0F0F0F;
+      --darker: #080808;
+      --mid:    #1A1A1A;
+      --card:   #161616;
+      --light:  #E8E0D5;
+      --muted:  #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--darker);
+      color: var(--light);
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 5%;
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: 3px;
+      color: var(--light);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--rust); }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--amber); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 5% 8%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(201,69,10,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(232,160,32,0.10) 0%, transparent 60%),
+        linear-gradient(160deg, #0F0F0F 0%, #1a1210 50%, #0F0F0F 100%);
+    }
+
+    /* Decorative diagonal lines */
+    .hero-lines {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .hero-lines::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -5%;
+      width: 55%;
+      height: 140%;
+      background: repeating-linear-gradient(
+        -15deg,
+        transparent,
+        transparent 38px,
+        rgba(255,255,255,0.018) 38px,
+        rgba(255,255,255,0.018) 40px
+      );
+    }
+
+    .hero-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--rust);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--rust);
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 11vw, 10rem);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      color: var(--light);
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    .hero h1 .accent { color: var(--rust); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--steel);
+      font-weight: 300;
+      letter-spacing: 1px;
+      margin-top: 20px;
+      max-width: 520px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: var(--rust);
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.15s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+    }
+
+    .btn-primary:hover { background: #e0560f; transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--light);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.2s, color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+    }
+
+    .btn-outline:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* ─── TICKER ─── */
+    .ticker {
+      background: var(--rust);
+      padding: 12px 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-inner {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 20s linear infinite;
+    }
+
+    .ticker-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      padding: 0 40px;
+    }
+
+    .ticker-item::after {
+      content: '◆';
+      margin-left: 40px;
+      opacity: 0.5;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ─── SECTION COMMONS ─── */
+    section { padding: 100px 5%; }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--rust);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--rust);
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      letter-spacing: 2px;
+      line-height: 1;
+      color: var(--light);
+      margin-bottom: 50px;
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      background: var(--mid);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .about-text p {
+      color: #aaa;
+      line-height: 1.85;
+      font-size: 1.02rem;
+      font-weight: 300;
+      margin-bottom: 16px;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      padding: 30px;
+      border-top: 2px solid transparent;
+      transition: border-color 0.3s;
+    }
+
+    .stat-card:hover { border-color: var(--amber); }
+
+    .stat-card .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.2rem;
+      color: var(--amber);
+      line-height: 1;
+    }
+
+    .stat-card .label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ─── METALS / SERVICES ─── */
+    #metals {
+      background: var(--darker);
+    }
+
+    .metals-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .metal-card {
+      background: var(--card);
+      padding: 40px 28px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.3s;
+    }
+
+    .metal-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--color);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .metal-card:hover::before { transform: scaleX(1); }
+    .metal-card:hover { transform: translateY(-4px); }
+
+    .metal-icon {
+      font-size: 2.4rem;
+      margin-bottom: 20px;
+    }
+
+    .metal-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: var(--light);
+      margin-bottom: 10px;
+    }
+
+    .metal-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .metal-tag {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid;
+      margin-top: 16px;
+      border-color: var(--color);
+      color: var(--color);
+    }
+
+    /* ─── WHY US ─── */
+    #why {
+      background: var(--mid);
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .why-card {
+      padding: 36px;
+      border: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .why-card:hover {
+      border-color: rgba(201,69,10,0.4);
+      background: rgba(201,69,10,0.04);
+    }
+
+    .why-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      color: rgba(255,255,255,0.04);
+      position: absolute;
+      top: 16px; right: 20px;
+      line-height: 1;
+    }
+
+    .why-icon {
+      font-size: 1.8rem;
+      margin-bottom: 18px;
+    }
+
+    .why-card h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 10px;
+    }
+
+    .why-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ─── CONTACT ─── */
+    #contact {
+      background: var(--darker);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #contact::before {
+      content: 'CONTACT';
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18vw;
+      color: rgba(255,255,255,0.015);
+      right: -2%;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .contact-block {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(201,69,10,0.15);
+      border: 1px solid rgba(201,69,10,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .contact-block h5 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 6px;
+    }
+
+    .contact-block p, .contact-block a {
+      color: var(--light);
+      font-size: 0.98rem;
+      font-weight: 300;
+      text-decoration: none;
+      line-height: 1.6;
+    }
+
+    .contact-block a:hover { color: var(--amber); }
+
+    /* Contact persons */
+    .contact-persons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .person-card {
+      background: var(--card);
+      padding: 28px;
+      border-top: 2px solid var(--rust);
+      transition: background 0.3s;
+    }
+
+    .person-card:hover { background: #1e1e1e; }
+
+    .person-card .role {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 8px;
+    }
+
+    .person-card .name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 12px;
+    }
+
+    .person-card .phone {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      font-size: 1.05rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .person-card .phone:hover { opacity: 0.75; }
+
+    .map-placeholder {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 300px;
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(201,69,10,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,69,10,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .map-pin {
+      font-size: 3rem;
+      position: relative;
+      z-index: 1;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .map-address {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--light);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #060606;
+      padding: 40px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: var(--light);
+    }
+
+    .footer-logo span { color: var(--rust); }
+
+    footer p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    footer p a { color: var(--muted); text-decoration: none; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      #about { grid-template-columns: 1fr; gap: 50px; }
+      .metals-grid { grid-template-columns: 1fr 1fr; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .contact-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 4%; }
+      .nav-links { display: none; }
+      .metals-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .contact-persons { grid-template-columns: 1fr; }
+      .hero h1 { font-size: clamp(3.5rem, 16vw, 5rem); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Kani<span> </span>Traders</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#metals">Metals</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-lines"></div>
+    <div class="hero-badge">Established — Metal Scrap Dealers</div>
+    <h1>KANI<br><span class="accent">TRADERS</span></h1>
+    <p class="hero-sub">Premium metal scrap dealers specializing in Stainless Steel, Aluminium, Brass & Copper — sourced, traded, and delivered with integrity.</p>
+    <div class="hero-cta">
+      <a href="#metals" class="btn-primary">Our Metals</a>
+      <a href="#contact" class="btn-outline">Get In Touch</a>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">Stainless Steel</span>
+      <span class="ticker-item">Aluminium</span>
+      <span class="ticker-item">Brass</span>
+      <span class="ticker-item">Copper</span>
+      <span class="ticker-item">Metal Scrap Dealers</span>
+      <span class="ticker-item">Best Market Rates</span>
+      <span class="ticker-item">Trusted Since Day One</span>
+      <span class="ticker-item">Stainless Steel</span>
+      <span class="ticker-item">Aluminium</span>
+      <span class="ticker-item">Brass</span>
+      <span class="ticker-item">Copper</span>
+      <span class="ticker-item">Metal Scrap Dealers</span>
+      <span class="ticker-item">Best Market Rates</span>
+      <span class="ticker-item">Trusted Since Day One</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-text reveal">
+      <div class="section-label">Who We Are</div>
+      <h2 class="section-title">YOUR TRUSTED<br>SCRAP METAL<br>PARTNER</h2>
+      <p>Kani Traders is a dedicated metal scrap dealer based in the heart of the city, committed to delivering reliable, transparent, and fair metal trading services for both small vendors and large industrial clients.</p>
+      <p>We deal in high-quality ferrous and non-ferrous metals — buying, selling, and processing scrap with the highest standards of accuracy and integrity. Our team evaluates every batch with precision to ensure you receive competitive market pricing, every time.</p>
+      <div style="margin-top: 28px;">
+        <a href="#contact" class="btn-primary">Contact Us Today</a>
+      </div>
+    </div>
+    <div class="about-stats reveal">
+      <div class="stat-card">
+        <div class="num">4+</div>
+        <div class="label">Metal Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">100%</div>
+        <div class="label">Fair Pricing</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">Fast</div>
+        <div class="label">Turnaround</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">Local</div>
+        <div class="label">Trusted Dealers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METALS -->
+  <section id="metals">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label" style="justify-content:center;">What We Trade</div>
+      <h2 class="section-title">OUR METALS</h2>
+    </div>
+    <div class="metals-grid">
+      <div class="metal-card reveal" style="--color: #B0C4DE;">
+        <div class="metal-icon">⚙️</div>
+        <h3>Stainless Steel</h3>
+        <p>All grades of stainless steel scrap accepted — sheets, rods, pipes, and industrial cutoffs. Corrosion-resistant and high-value.</p>
+        <span class="metal-tag">Ferrous Metal</span>
+      </div>
+      <div class="metal-card reveal" style="--color: #C0D0A0;">
+        <div class="metal-icon">🔩</div>
+        <h3>Aluminium</h3>
+        <p>Lightweight and recyclable — we buy aluminium in all forms including extrusions, castings, sheets, cables, and scrap batches.</p>
+        <span class="metal-tag">Non-Ferrous</span>
+      </div>
+      <div class="metal-card reveal" style="--color: #E8A020;">
+        <div class="metal-icon">🔧</div>
+        <h3>Brass</h3>
+        <p>Yellow and red brass, fittings, valves, rods, and turnings. We offer competitive rates for brass scrap across all grades.</p>
+        <span class="metal-tag">Non-Ferrous</span>
+      </div>
+      <div class="metal-card reveal" style="--color: #C9450A;">
+        <div class="metal-icon">⚡</div>
+        <h3>Copper</h3>
+        <p>Bare bright copper, insulated wire, tubing, and busbars. Copper is among the most valuable recyclable metals — get top rates with us.</p>
+        <span class="metal-tag">Non-Ferrous</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section id="why">
+    <div class="reveal">
+      <div class="section-label">Our Advantage</div>
+      <h2 class="section-title">WHY CHOOSE<br>KANI TRADERS</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <span class="why-num">01</span>
+        <div class="why-icon">⚖️</div>
+        <h4>Accurate Weighing</h4>
+        <p>We use calibrated scales and transparent weighing processes — no hidden deductions. You see exactly what you're paid for.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-num">02</span>
+        <div class="why-icon">💸</div>
+        <h4>Market-Best Rates</h4>
+        <p>Our pricing reflects daily market values. We stay updated with LME and local market rates to ensure you're always getting a fair deal.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-num">03</span>
+        <div class="why-icon">🤝</div>
+        <h4>Trusted Relationships</h4>
+        <p>We build long-term partnerships with our clients. Repeat sellers and bulk traders get priority service and preferred pricing.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-num">04</span>
+        <div class="why-icon">🚚</div>
+        <h4>Doorstep Pickup</h4>
+        <p>Got bulk scrap? We arrange convenient pickup services so you don't have to worry about transportation logistics.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-num">05</span>
+        <div class="why-icon">📋</div>
+        <h4>Proper Documentation</h4>
+        <p>All transactions come with proper receipts and records — fully compliant and hassle-free for individuals and businesses alike.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-num">06</span>
+        <div class="why-icon">🌿</div>
+        <h4>Eco-Friendly Recycling</h4>
+        <p>Metal recycling reduces industrial waste and conserves natural resources. Every sale you make with us contributes to a greener future.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="reveal">
+      <div class="section-label">Reach Out</div>
+      <h2 class="section-title">GET IN TOUCH</h2>
+    </div>
+    <div class="contact-layout">
+      <div class="contact-info reveal">
+        <div class="contact-block">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h5>Our Location</h5>
+            <p>No.1A/14, Gandhi Street, Kanu Nagar, Nesapakkam, Chennai - 600078<br>Tamil Nadu, India</p>
+          </div>
+        </div>
+        <div class="contact-block">
+          <div class="contact-icon">🏭</div>
+          <div>
+            <h5>Business Type</h5>
+            <p>Metal Scrap Dealers<br>Stainless Steel · Aluminium · Brass · Copper</p>
+          </div>
+        </div>
+        <div class="contact-block">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <h5>Working Hours</h5>
+            <p>Monday – Saturday: 9:00 AM – 8:00 PM<br>Sunday: Till 1:00 PM</p>
+          </div>
+        </div>
+
+        <!-- CONTACT PERSONS -->
+        <div>
+          <h5 style="font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:12px; display:flex;align-items:center;gap:8px;">
+            <span style="display:block;width:20px;height:1px;background:var(--rust);"></span>
+            Contact Us
+          </h5>
+          <div class="contact-persons">
+            <div class="person-card">
+              <div class="role">Contact Person 1</div>
+              <div class="name">Muthulingam</div>
+              <a href="tel:+919841023175" class="phone">
+                <span>📞</span>
+                <span>+91 98410 23175</span>
+              </a>
+            </div>
+            <div class="person-card">
+              <div class="role">Contact Person 2</div>
+              <div class="name">Raghu</div>
+              <a href="tel:+917845769998" class="phone">
+                <span>📞</span>
+                <span>+91 78457 69998</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-placeholder reveal">
+        <div class="map-pin">📍</div>
+        <div class="map-address">
+          <strong style="font-size:1rem; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; display:block; margin-bottom:6px;">Kani Traders</strong>
+          No.1A/14, Gandhi Street, Kanu Nagar, Nesapakkam, Chennai - 600078<br>Tamil Nadu, India
+        </div>
+        <a href="https://maps.app.goo.gl/LaDXdxXusQyhLsaw5" target="_blank" class="btn-outline" style="margin-top:16px; font-size:0.75rem; padding:10px 24px;">Open in Maps</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Kani<span>&nbsp;</span>Traders</div>
+    <p>No.1A/14, Gandhi Street, Kanu Nagar, Nesapakkam, Chennai - 600078</p>
+    <p>© 2026 Kani Traders. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Intersection Observer for reveal animations
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 60 * i);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth active nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--amber)' : '';
+      });
+    });
+  </script>
+</body>
+</html>
